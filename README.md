@@ -11,10 +11,7 @@ For clarification:
 
 # Overview
 
-<aside>
 💡 **tl;dr STONE is the first self-supervised tonality estimator.**
-
-</aside>
 
 The architecture behind STONE, named `ChromaNet`, is a convnet with octave equivalence which outputs a key signature profile (KSP) of 12 structured logits.
 We train ChromaNet to regress artificial pitch transpositions between any two unlabeled musical excerpts from the same audio track.
@@ -23,6 +20,8 @@ We train ChromaNet to regress artificial pitch transpositions between any two un
 
 Overview of our proposed STONE architecture.
 
+## Front-end
+
 We extract two segments from the same audio track, and crop them in the way so that we create one pair of segments in the same key and another pair in different keys. Then we pass the CQTs into ChromaNet and obtain the KSPs. 
 
 We calculate the Discrete Fourier Transform (DFT), which can be seen as a projection into the circle of fifths (or semitones). 
@@ -30,6 +29,8 @@ We calculate the Discrete Fourier Transform (DFT), which can be seen as a projec
 A illustration of the Equation 2 (the DFT) in the original paper is shown as below:
 
 ![dft.jpg](figures/dft.jpg)
+
+## Cross-power spectral density and loss
 
 The losses are then bases on the distance of these projections on the circle of fifths (or semitones), measured as Cross-power spectral density (CPSD).
 
@@ -42,9 +43,7 @@ The CPSD is defined as:
 where $`\boldsymbol{R}_{\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}},\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}}[k] =
 \sum_{q=0}^{Q-1} \boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}}[q] \boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}[(q+k)\,\textrm{mod}\,Q]`$. 
 
-Intuitively, in the case where  $`\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{A}}}[\omega]`$  *and*  $`\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{B}}}[\omega]`$ are both one hot-encoding of 12 dimensions, they will be mapped as complex numbers of module 1 on the border of the CoF. 
-
-$`\widehat{\boldsymbol{R}}{ \boldsymbol{y}_{\boldsymbol{\theta},\mathrm{A}},\boldsymbol{y}_{\boldsymbol{\theta},\mathrm{B}}}[\omega]`$ measures the difference of phases on the CoF. 
+Intuitively, in the case where  $`\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{A}}}[\omega]`$  *and*  $`\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{B}}}[\omega]`$ are both one hot-encoding of 12 dimensions, they will be mapped as complex numbers of module 1 on the border of the CoF. $`\widehat{\boldsymbol{R}}{ \boldsymbol{y}_{\boldsymbol{\theta},\mathrm{A}},\boldsymbol{y}_{\boldsymbol{\theta},\mathrm{B}}}[\omega]`$ measures the difference of phases on the CoF. 
 
 The equation for loss calculation is defined as:
 
@@ -55,13 +54,13 @@ e^{- 2\pi\mathrm{i}\omega k/Q} - \widehat{\boldsymbol{R}}_{ \boldsymbol{y}_{\bol
 
 Continuing the intuitive case above, $`\mathcal{D}_{\boldsymbol{\theta},k}(\boldsymbol{x}_{\mathrm{A}}, \boldsymbol{x}_{\mathrm{B}})`$ measures its deviation from the DFT basis vector $e^{- 2\pi\mathrm{i}\omega k/Q}$, which corresponds to the actual pitch shift k on the CoF.
 
-The same formula is applied to different segment combinations, with or without pitch transpositions in between.
+The same formula is applied to different segment combinations, with or without pitch transpositions in between, to calculate loss.
 
 Please refer to the original paper for more detailed explanation.
 
-We evaluate these estimators on [FMAKv2](https://zenodo.org/records/12759100), a new dataset of 5489 real-world musical recordings with expert annotation of 24 major and minor keys.
+## Evaluation
 
-We observe that this self-supervised pretext task leads KSP to correlate with tonal key signature.
+We evaluate these estimators on [FMAKv2](https://zenodo.org/records/12759100), a new dataset of 5489 real-world musical recordings with expert annotation of 24 major and minor keys and observe that this self-supervised pretext task leads KSP to correlate with tonal key signature.
 
 | **Model** | **Correct** | **Fifth** | **KSEA** |
 | --- | --- | --- | --- |
@@ -70,21 +69,22 @@ We observe that this self-supervised pretext task leads KSP to correlate with to
 | **STONE** (w=1) | **3883** | 920 | **79%** |
 | Supervised SOTA [Korzeniowski 2018] | 4090 | 741 | 81% |
 
+## Semi-supervised learning for key signature and mode
+
 Based on this observation, we extend STONE to output a structured KSP of 24 logits, and introduce supervision so as to disambiguate major versus minor keys sharing the same key signature.
 
 Applying different amounts of supervision yields semi-supervised and fully supervised tonality estimators: i.e., Semi-TONEs and Sup-TONEs.
 
 ![Evaluation of self-supervised (dashed blue), semi-supervised (solid blue), and supervised models (orange) on FMAK. All models use $\omega=7$. We also report the supervised state of the art (SOTA).](figures/comparison.png)
 
-Evaluation of self-supervised (dashed blue), semi-supervised (solid blue), and supervised models (orange) on FMAK. All models use $\omega=7$. We also report the supervised state of the art (SOTA).
+This figure shows the results of self-supervised (dashed blue), semi-supervised (solid blue), and supervised models (orange) on FMAK. All models use $\omega=7$. We also report the supervised state of the art (SOTA).
 
 We find that Semi-TONE matches the classification accuracy of Sup-TONE with reduced supervision and outperforms it with equal supervision.
 
-The confusion matrix of Semi-TONE and STONE (for key signature prediction):
+We plot the confusion matrices of STONE (left, 12 classes) and Semi-TONE (right, 24 classes) on FMAK to further visualize the performance of our models. The axis correspond to model prediction and reference respectively, keys arranged by proximity in the CoF and relative modes. Deeper colors indicate more frequent occurences per relative occurence per reference key.
 
 ![Confusion matrices of STONE (left, 12 classes) and Semi-TONE (right, 24 classes) on FMAK, both using w=7. The axis correspond to model prediction and reference respectively, keys arranged by proximity in the CoF and relative modes. Deeper colors indicate more frequent occurences per relative occurence per reference key.](figures/conf.png)
 
-Confusion matrices of STONE (left, 12 classes) and Semi-TONE (right, 24 classes) on FMAK, both using w=7. The axis correspond to model prediction and reference respectively, keys arranged by proximity in the CoF and relative modes. Deeper colors indicate more frequent occurences per relative occurence per reference key.
 
 # Setup
 
@@ -117,14 +117,10 @@ poetry run python <script>
 
 ## Dataloader
 
-The dataloader provides waveform data for the model. 
+The dataloader provides waveform data for the model. We do not provide the exact code for dataloader, however we provide the shape and the property of training data needed. 
 
-We don’t provide the exact code for dataloader, however we provide the shape and the property of training data needed. 
-
-<aside>
 💡 **NOTE**: like the `Class Toydataset` provided in the code, your dataloader should be able to provide infinite amount of training data to be able to fit the training code. This can be achieved by using `ds.repeat()` if you use `tensorflow` for loading and processing audios, or `IterableDataset` if you use `pytorch`.
 
-</aside>
 
 1. **Data shape for `stone12` :** the data shape of each batch should be (batch_size, duration*sampling_rate, 2). “2” corresponds the number of segments needed from each track. They are assumed to have the same key.
 2. **Data shape for `stone24` :** there are three modes for the dataloader: “supervised”, “selfsupervised” or “mixed”. In all cases, the data of each batch should be a dictionary which contains two items: *audio* and *keymode.*
@@ -184,47 +180,49 @@ map_ks_mode = {0: 'B minor', 1: 'C minor', 2: 'C# minor', 3: 'D minor', 4: 'D# m
 If you train your own models, then the mapping needs to be calculated by using a C major recording provided in the folder `/pitch_fork/Cmajor.mp3` and the output of this input should correspond to the one of C Major.
 
 # Code organisation
-stone
-├── Dockerfile
-├── pyproject.toml
-├── README.md
-├── init.py
-├── figures
-│   ├── Cmajor.mp3
-├── ckpt
-│   ├── semisupervised_ks_mode.pt
-│   └── semitone_ks.pt
-├── config
-│   ├── ks.gin
-│   └── ks_mode.gin
-├── src
-│   ├── hcqt.py
-│   ├── stone12
-│   │   ├── init.py
-│   │   ├── dataloader
-│   │   │   └── init.py
-│   │   ├── model
-│   │   │   ├── chromanet.py
-│   │   │   └── convnext.py
-│   │   ├── stone.py
-│   │   └── stone_loss.py
-│   ├── stone24
-│   │   ├── init.py
-│   │   ├── dataloader
-│   │   │   └── init.py
-│   │   ├── model
-│   │   │   ├── chromanet.py
-│   │   │   └── convnext.py
-│   │   ├── stone.py
-│   │   └── stone_loss.py
-│   └── utils
-│       ├── callbacks.py
-│       ├── gin.py
-│       ├── scheduler.py
-│       └── training.py
-├── inference.py
-├── main.py
-└── training_loop.py
+```code
+stone  
+├── Dockerfile  
+├── pyproject.toml  
+├── README.md  
+├── init.py  
+├── figures  
+│   ├── Cmajor.mp3  
+├── ckpt  
+│   ├── semisupervised_ks_mode.pt  
+│   └── semitone_ks.pt  
+├── config  
+│   ├── ks.gin  
+│   └── ks_mode.gin  
+├── src  
+│   ├── hcqt.py  
+│   ├── stone12  
+│   │   ├── init.py  
+│   │   ├── dataloader  
+│   │   │   └── init.py  
+│   │   ├── model  
+│   │   │   ├── chromanet.py  
+│   │   │   └── convnext.py  
+│   │   ├── stone.py  
+│   │   └── stone_loss.py  
+│   ├── stone24  
+│   │   ├── init.py  
+│   │   ├── dataloader  
+│   │   │   └── init.py  
+│   │   ├── model  
+│   │   │   ├── chromanet.py  
+│   │   │   └── convnext.py  
+│   │   ├── stone.py  
+│   │   └── stone_loss.py  
+│   └── utils  
+│       ├── callbacks.py  
+│       ├── gin.py  
+│       ├── scheduler.py  
+│       └── training.py  
+├── inference.py  
+├── main.py  
+└── training_loop.py  
+```
 
 # Cite
 
