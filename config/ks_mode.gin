@@ -1,0 +1,15 @@
+src.hcqt.HarmonicVQT.harmonics = [1]
+src.hcqt.HarmonicVQT.fmin = 27.5
+src.hcqt.HarmonicVQT.n_bins = 99
+src.hcqt.HarmonicVQT.bins_per_octave = 12
+
+src.stone24.stone.Stone.out_channels = [2, 3, 40, 40, 30, 10, 3]
+src.stone24.stone.Stone.kernels = [7, 7, 7, 7, 7, 5, 5]
+src.stone24.stone.Stone.temperature = 1
+src.stone24.stone.Stone.n_bins = 84
+
+src.stone24.dataloader.get_datasets.dataset_type_train = "mix"
+src.stone24.dataloader.get_datasets.dataset_type_test = "mix"
+src.stone24.dataloader.get_datasets.sr = 22050
+src.stone24.dataloader.get_datasets.duration = 15
+src.stone24.dataloader.get_datasets.batch_size = 128 
