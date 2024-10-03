@@ -12,9 +12,7 @@ For clarification:
 # Overview
 
 <aside>
-💡
-
-**tl;dr STONE is the first self-supervised tonality estimator.**
+💡 **tl;dr STONE is the first self-supervised tonality estimator.**
 
 </aside>
 
@@ -37,25 +35,25 @@ The losses are then bases on the distance of these projections on the circle of 
 
 The CPSD is defined as:
 
-$$
+```math
 \widehat{\boldsymbol{R}}_{\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}},\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}}[\omega] = \mathcal{F}\{\boldsymbol{R}_{\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}},\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}}\}[\omega] = \widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{A}}}[\omega]\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{B}}}^{\ast}[\omega]
-$$
+```
 
-where $\boldsymbol{R}_{\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}},\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}}[k] =
-\sum_{q=0}^{Q-1} \boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}}[q] \boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}[(q+k)\,\textrm{mod}\,Q]$. 
+where $`\boldsymbol{R}_{\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}},\boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}}[k] =
+\sum_{q=0}^{Q-1} \boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{A}}}[q] \boldsymbol{y}_{\boldsymbol{\theta},{\mathrm{B}}}[(q+k)\,\textrm{mod}\,Q]`$. 
 
-Intuitively, in the case where  $\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{A}}}[\omega]$  *and*  $\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{B}}}[\omega]$ are both one hot-encoding of 12 dimensions, they will be mapped as complex numbers of module 1 on the border of the CoF. 
+Intuitively, in the case where  $`\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{A}}}[\omega]`$  *and*  $`\widehat{\boldsymbol{y}}_{\boldsymbol{\theta},{\mathrm{B}}}[\omega]`$ are both one hot-encoding of 12 dimensions, they will be mapped as complex numbers of module 1 on the border of the CoF. 
 
-$*\widehat{\boldsymbol{R}}{ \boldsymbol{y}_{\boldsymbol{\theta},\mathrm{A}},\boldsymbol{y}_{\boldsymbol{\theta},\mathrm{B}}}[\omega]$* measures the difference of phases on the CoF. 
+$`\widehat{\boldsymbol{R}}{ \boldsymbol{y}_{\boldsymbol{\theta},\mathrm{A}},\boldsymbol{y}_{\boldsymbol{\theta},\mathrm{B}}}[\omega]`$ measures the difference of phases on the CoF. 
 
 The equation for loss calculation is defined as:
 
-$$
+```math
 \mathcal{D}_{\boldsymbol{\theta},k}(\boldsymbol{x}_{\mathrm{A}}, \boldsymbol{x}_{\mathrm{B}}) = \dfrac{1}{2} \big \vert
 e^{- 2\pi\mathrm{i}\omega k/Q} - \widehat{\boldsymbol{R}}_{ \boldsymbol{y}_{\boldsymbol{\theta},\mathrm{A}},\boldsymbol{y}_{\boldsymbol{\theta},\mathrm{B}}}[\omega] \big \vert^2
-$$
+```
 
-Continuing the intuitive case above, $\mathcal{D}_{\boldsymbol{\theta},k}(\boldsymbol{x}_{\mathrm{A}}, \boldsymbol{x}_{\mathrm{B}})$ measures its deviation from the DFT basis vector $e^{- 2\pi\mathrm{i}\omega k/Q}$, which corresponds to the actual pitch shift k on the CoF.
+Continuing the intuitive case above, $`\mathcal{D}_{\boldsymbol{\theta},k}(\boldsymbol{x}_{\mathrm{A}}, \boldsymbol{x}_{\mathrm{B}})`$ measures its deviation from the DFT basis vector $e^{- 2\pi\mathrm{i}\omega k/Q}$, which corresponds to the actual pitch shift k on the CoF.
 
 The same formula is applied to different segment combinations, with or without pitch transpositions in between.
 
@@ -124,9 +122,7 @@ The dataloader provides waveform data for the model.
 We don’t provide the exact code for dataloader, however we provide the shape and the property of training data needed. 
 
 <aside>
-💡
-
-NOTE: like the `Class Toydataset` provided in the code, your dataloader should be able to provide infinite amount of training data to be able to fit the training code. This can be achieved by using `ds.repeat()` if you use `tensorflow` for loading and processing audios, or `IterableDataset` if you use `pytorch`.
+💡 **NOTE**: like the `Class Toydataset` provided in the code, your dataloader should be able to provide infinite amount of training data to be able to fit the training code. This can be achieved by using `ds.repeat()` if you use `tensorflow` for loading and processing audios, or `IterableDataset` if you use `pytorch`.
 
 </aside>
 
@@ -188,13 +184,13 @@ map_ks_mode = {0: 'B minor', 1: 'C minor', 2: 'C# minor', 3: 'D minor', 4: 'D# m
 If you train your own models, then the mapping needs to be calculated by using a C major recording provided in the folder `/pitch_fork/Cmajor.mp3` and the output of this input should correspond to the one of C Major.
 
 # Code organisation
-
-```
 stone
 ├── Dockerfile
 ├── pyproject.toml
-├── [README.md](http://readme.md/)
-├── [**init.py**](http://init.py/)
+├── README.md
+├── init.py
+├── figures
+│   ├── Cmajor.mp3
 ├── ckpt
 │   ├── semisupervised_ks_mode.pt
 │   └── semitone_ks.pt
@@ -202,34 +198,33 @@ stone
 │   ├── ks.gin
 │   └── ks_mode.gin
 ├── src
-│   ├── [hcqt.py](http://hcqt.py/)
+│   ├── hcqt.py
 │   ├── stone12
-│   │   ├── **init**.py
+│   │   ├── init.py
 │   │   ├── dataloader
-│   │   │   └── **init**.py
+│   │   │   └── init.py
 │   │   ├── model
-│   │   │   ├── [chromanet.py](http://chromanet.py/)
-│   │   │   └── [convnext.py](http://convnext.py/)
-│   │   ├── [stone.py](http://stone.py/)
+│   │   │   ├── chromanet.py
+│   │   │   └── convnext.py
+│   │   ├── stone.py
 │   │   └── stone_loss.py
 │   ├── stone24
-│   │   ├── **init**.py
+│   │   ├── init.py
 │   │   ├── dataloader
-│   │   │   └── **init**.py
+│   │   │   └── init.py
 │   │   ├── model
-│   │   │   ├── [chromanet.py](http://chromanet.py/)
-│   │   │   └── [convnext.py](http://convnext.py/)
-│   │   ├── [stone.py](http://stone.py/)
+│   │   │   ├── chromanet.py
+│   │   │   └── convnext.py
+│   │   ├── stone.py
 │   │   └── stone_loss.py
 │   └── utils
-│       ├── [callbacks.py](http://callbacks.py/)
-│       ├── [gin.py](http://gin.py/)
-│       ├── [scheduler.py](http://scheduler.py/)
-│       └── [training.py](http://training.py/)
-├── [inference.py](http://inference.py/)
-├── [main.py](http://main.py/)
+│       ├── callbacks.py
+│       ├── gin.py
+│       ├── scheduler.py
+│       └── training.py
+├── inference.py
+├── main.py
 └── training_loop.py
-```
 
 # Cite
 
