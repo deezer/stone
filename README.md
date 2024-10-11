@@ -1,4 +1,5 @@
-# STONE: Self-supervised Tonality Estimator <img src="figures/logo.png" height=180>
+# STONE: Self-supervised Tonality Estimator [<img src="figures/logo.png" height=180>](https://www.instagram.com/capodaglieli?igsh=MXBteDFoazRvczI5eQ==)
+
 
 This repository contains the checkpoints and the full training and inference code for the two models proposed in [STONE paper](https://arxiv.org/abs/2407.07408), accepted at [ISMIR 2024](https://ismir2024.ismir.net). We name them respectively stone12 and stone24 in the repository. 
 
@@ -6,8 +7,8 @@ It can be easily used for both training and inference.
 
 For clarification:
 
-- **stone12:**  the self-supervised key signature estimator (referred as STONE in the original paper).
-- **stone24:** the semi-supervised (can also be trained fully self-supervised and fully supervised) key signature and mode estimator (referred as 24-STONE, semi-TONE, sup-TONE in the original paper).
+- **stone12:**  the self-supervised key signature estimator (referred as STONE in the [original paper](https://arxiv.org/abs/2407.07408)).
+- **stone24:** the semi-supervised (can also be trained fully self-supervised and fully supervised) key signature and mode estimator (referred as 24-STONE, semi-TONE, sup-TONE in the [original paper](https://arxiv.org/abs/2407.07408)).
 
 # Table of Contents
 
@@ -31,7 +32,7 @@ For clarification:
 - [Code organisation](#code-organisation)
 - [Cite](#cite)
 
-# Overview <img src="figures/logo.png" height=180>
+# Overview [<img src="figures/logo.png" height=180>](https://www.instagram.com/capodaglieli?igsh=MXBteDFoazRvczI5eQ==)
 
 💡 **tl;dr STONE is the first self-supervised tonality estimator.**
 
@@ -48,7 +49,7 @@ We extract two segments from the same audio track, and crop them in the way so t
 
 We calculate the Discrete Fourier Transform (DFT), which can be seen as a projection into the circle of fifths (or semitones). 
 
-A illustration of the Equation 2 (the DFT) in the original paper is shown as below:
+A illustration of the Equation 2 (the DFT) in the [original paper](https://arxiv.org/abs/2407.07408) is shown as below:
 
 ![dft.jpg](figures/dft.jpg)
 
@@ -78,7 +79,7 @@ Continuing the intuitive case above, $`\mathcal{D}_{\boldsymbol{\theta},k}(\bold
 
 The same formula is applied to different segment combinations, with or without pitch transpositions in between, to calculate loss.
 
-Please refer to the original paper for more detailed explanation.
+Please refer to the [original paper](https://arxiv.org/abs/2407.07408) for more detailed explanation.
 
 ## Evaluation
 
@@ -108,7 +109,7 @@ We plot the confusion matrices of STONE (left, 12 classes) and Semi-TONE (right,
 ![Confusion matrices of STONE (left, 12 classes) and Semi-TONE (right, 24 classes) on FMAK, both using w=7. The axis correspond to model prediction and reference respectively, keys arranged by proximity in the CoF and relative modes. Deeper colors indicate more frequent occurences per relative occurence per reference key.](figures/conf.png)
 
 
-# Code usage <img src="figures/logo.png" height=180>
+# Code usage [<img src="figures/logo.png" height=180>](https://www.instagram.com/capodaglieli?igsh=MXBteDFoazRvczI5eQ==)
 ## Environment setup
 
  `Python 3.10` is used for this project. `Poetry` is used to manage packages. We also provide a Dockerfile for users to run the program inside of a docker container. 
@@ -147,9 +148,9 @@ The dataloader provides waveform data for the model. We do not provide the exact
 
 1. **Data shape for `stone12` :** the data shape of each batch should be (batch_size, duration*sampling_rate, 2). “2” corresponds the number of segments needed from each track. They are assumed to have the same key.
 2. **Data shape for `stone24` :** there are three modes for the dataloader: “supervised”, “selfsupervised” or “mixed”. You can specify the type in the corresponding gin file. In all cases, the data of each batch should be a dictionary which contains two items: *audio* and *keymode.*
-    1. **selfsupervised**: the data shape of *audio* should be (batch_size, duration*sampling_rate, 2), just like for `stone12` . *keymode* should be a tuple of a list as `([”-1” * batch_size])`. This is the dataloader used for the fully self-supervised 24-STONE model in the original paper.
-    2. **supervised:** the data shape of *audio* should be (batch_size, duration*sampling_rate, 1), since we do NOT need  a second segment from the audio. *keymode* should be a tuple of a list that contains the labels for corresponding audios, such as `([”A minor”, “C Major”, “Bb minor”, …])`. This is the dataloader used for all the Sup-TONE models in the original paper.
-    3. **mixed:** the dataloader alternates between a and b. This is the dataloader used for all Semi-TONE models in the original paper.
+    1. **selfsupervised**: the data shape of *audio* should be (batch_size, duration*sampling_rate, 2), just like for `stone12` . *keymode* should be a tuple of a list as `([”-1” * batch_size])`. This is the dataloader used for the fully self-supervised 24-STONE model in the [original paper](https://arxiv.org/abs/2407.07408).
+    2. **supervised:** the data shape of *audio* should be (batch_size, duration*sampling_rate, 1), since we do NOT need  a second segment from the audio. *keymode* should be a tuple of a list that contains the labels for corresponding audios, such as `([”A minor”, “C Major”, “Bb minor”, …])`. This is the dataloader used for all the Sup-TONE models in the [original paper](https://arxiv.org/abs/2407.07408).
+    3. **mixed:** the dataloader alternates between a and b. This is the dataloader used for all Semi-TONE models in the [original paper](https://arxiv.org/abs/2407.07408).
 
 💡 **NOTE** : the audio should be normalised to a value range of [0, 1]. The sampling rate we use is `22050Hz`, and the segment length is `15s`, as provided in gin files under `/config` . However you can modify these values easily in the gin files.
 
@@ -198,7 +199,7 @@ map_ks_mode = {0: 'B minor', 1: 'C minor', 2: 'C# minor', 3: 'D minor', 4: 'D# m
 
 If you train your own models, then the mapping needs to be calculated by using the C major recording provided in the folder `/pitch_fork/Cmajor.mp3` and the output of this input should correspond to the one of C Major.
 
-# Code organisation <img src="figures/logo.png" height=180>
+# Code organisation [<img src="figures/logo.png" height=180>](https://www.instagram.com/capodaglieli?igsh=MXBteDFoazRvczI5eQ==)
 ```code
 stone  
 ├── Dockerfile  
@@ -244,7 +245,7 @@ stone
 └── training_loop.py  
 ```
 
-# Cite <img src="figures/logo.png" height=200>
+# Cite [<img src="figures/logo.png" height=180>](https://www.instagram.com/capodaglieli?igsh=MXBteDFoazRvczI5eQ==)
 
 If you use this work, please cite:
 
@@ -256,3 +257,4 @@ If you use this work, please cite:
   year={2024}
 }
 ```
+If you like the cute STONE logo, you can click on the image to have a look at Elisa Capodagli's other wonderful work :)
