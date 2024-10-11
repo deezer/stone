@@ -16,7 +16,8 @@ For clarification:
   - [Cross-power spectral density and loss](#cross-power-spectral-density-and-loss)
   - [Evaluation](#evaluation)
   - [Semi-supervised learning for key signature and mode](#semi-supervised-learning-for-key-signature-and-mode)
-- [Setup](#setup)
+- [Code usage](#code-usage)
+  - [Environment setup](#environment-setup)
   - [Training](#training)
     - [Example usage](#example-usage)
     - [Command-line arguments](#command-line-arguments)
@@ -107,7 +108,8 @@ We plot the confusion matrices of STONE (left, 12 classes) and Semi-TONE (right,
 ![Confusion matrices of STONE (left, 12 classes) and Semi-TONE (right, 24 classes) on FMAK, both using w=7. The axis correspond to model prediction and reference respectively, keys arranged by proximity in the CoF and relative modes. Deeper colors indicate more frequent occurences per relative occurence per reference key.](figures/conf.png)
 
 
-# Setup <img src="figures/logo.png" height=180>
+# Code usage <img src="figures/logo.png" height=180>
+## Environment setup
 
  `Python 3.10` is used for this project. `Poetry` is used to manage packages. We also provide a Dockerfile for users to run the program inside of a docker container. 
 
