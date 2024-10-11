@@ -1,4 +1,4 @@
-# STONE: Self-supervised Tonality Estimator
+# STONE: Self-supervised Tonality Estimator ![STONE logo](figures/logo.png)
 
 This repository contains the checkpoints and the full training and inference code for the two models proposed in [STONE paper](https://arxiv.org/abs/2407.07408), accepted at [ISMIR 2024](https://ismir2024.ismir.net). We name them respectively stone12 and stone24 in the repository. 
 
@@ -8,7 +8,6 @@ For clarification:
 
 - **stone12:**  the self-supervised key signature estimator (referred as STONE in the original paper).
 - **stone24:** the semi-supervised (can also be trained fully self-supervised and fully supervised) key signature and mode estimator (referred as 24-STONE, semi-TONE, sup-TONE in the original paper).
-
 # Overview
 
 💡 **tl;dr STONE is the first self-supervised tonality estimator.**
@@ -32,7 +31,7 @@ A illustration of the Equation 2 (the DFT) in the original paper is shown as bel
 
 ## Cross-power spectral density and loss
 
-The losses are then bases on the distance of these projections on the circle of fifths (or semitones), measured as Cross-power spectral density (CPSD).
+The losses are then based on the distance of these projections on the circle of fifths (or semitones), measured as Cross-power spectral density (CPSD).
 
 The CPSD is defined as:
 
@@ -106,9 +105,9 @@ poetry run python <script>
 
 ## Command-line arguments
 
-- `-n` `—-exp-name`, the name of the experiment. If the experience name was used before and
+- `-n` `—-exp-name`, the name of the experiment. If the experience name was used before and checkpoints are saved, then the training will continue from the checkpoint of the experiment of the same name.
 - `-tt` `--train-type` , type of training: `ks` (key signature) for stone12, `ks_mode` for stone24.
-- `-c` `--circle-type` , the circle where key signature profile is projected. 1 or 7.
+- `-c` `--circle-type` , the circle where key signature profile is projected. 1 or 7. 1 for circle of semitones and y for circle of fifths.
 - `-s` `--save-dir`, the path where the checkpoint and tensorboard logs will be saved.
 - `-e` `--n-epochs` , number of epochs.
 - `-ts` `-train-steps` , steps of training per epoch.
@@ -123,17 +122,13 @@ The dataloader provides waveform data for the model. We do not provide the exact
 
 
 1. **Data shape for `stone12` :** the data shape of each batch should be (batch_size, duration*sampling_rate, 2). “2” corresponds the number of segments needed from each track. They are assumed to have the same key.
-2. **Data shape for `stone24` :** there are three modes for the dataloader: “supervised”, “selfsupervised” or “mixed”. In all cases, the data of each batch should be a dictionary which contains two items: *audio* and *keymode.*
-    1. **selfsupervised**: the data shape of *audio* should be (batch_size, duration*sampling_rate, 2), just like for `stone12` . *keymode* should be a tuple of a list as `([”-1” * batch_size])`. This is the dataloader used for the 24-STONE model in the original paper.
+2. **Data shape for `stone24` :** there are three modes for the dataloader: “supervised”, “selfsupervised” or “mixed”. You can specify the type in the corresponding gin file. In all cases, the data of each batch should be a dictionary which contains two items: *audio* and *keymode.*
+    1. **selfsupervised**: the data shape of *audio* should be (batch_size, duration*sampling_rate, 2), just like for `stone12` . *keymode* should be a tuple of a list as `([”-1” * batch_size])`. This is the dataloader used for the fully self-supervised 24-STONE model in the original paper.
     2. **supervised:** the data shape of *audio* should be (batch_size, duration*sampling_rate, 1), since we do NOT need  a second segment from the audio. *keymode* should be a tuple of a list that contains the labels for corresponding audios, such as `([”A minor”, “C Major”, “Bb minor”, …])`. This is the dataloader used for all the Sup-TONE models in the original paper.
     3. **mixed:** the dataloader alternates between a and b. This is the dataloader used for all Semi-TONE models in the original paper.
 
-<aside>
-💡
+💡 **NOTE** : the audio should be normalised to a value range of [0, 1]. The sampling rate we use is `22050Hz`, and the segment length is `15s`, as provided in gin files under `/config` . However you can modify these values easily in the gin files.
 
-NOTE: the audio should be normalised to a value range of [0, 1]. The sampling rate we use is `22050Hz`, and the segment length is `15s`, as provided in gin files under `/config` . However you can modify these values easily in the gin files.
-
-</aside>
 
 ## Device
 
@@ -145,7 +140,7 @@ We use gin file to configure parameters for audio and architecture, more informa
 
 ## Results
 
-Models with checkpoints are saved at `./<save_dir>/models/<train_type>/<circle_type>/<name>/` where `save_dir` is passed with the tag `-s` and `name` is passed with the tag `-c` ; Tensorboard information is saved at `./<save_dir>/tensorboard/<train_type>/<circle_type>/<name>/`
+Checkpoints are saved at `./<save_dir>/models/<train_type>/<circle_type>/<name>/` where `save_dir` is passed with the tag `-s` and `name` is passed with the tag `-c` ; Tensorboard information is saved at `./<save_dir>/tensorboard/<train_type>/<circle_type>/<name>/`.
 
 # Inference
 
@@ -153,7 +148,7 @@ Models with checkpoints are saved at `./<save_dir>/models/<train_type>/<circle_t
 
 `poetry run python -m inference /checkpoint/path /audio/path -e mp3 -tt ks`
 
-checkpoint path is the path where checkpoint is saved: we provided two checkpoints under `/ckpt`. `semisupervised_key_mode.pt` is for both key signature and mode estimation. `semitone_ks.pt` is for key signature estimation.
+checkpoint path is the path where checkpoint is saved: we provided two checkpoints under `/ckpt`. `semisupervised_key_mode.pt` is the best Semi-TONE model for key signature and mode estimation. `semitone_ks.pt` is the best STONE model for key signature estimation. `semitone_ks.pt` performs slightly better than results reported in the paper.
 
 audio path is the the path to the folder where audios are saved.
 
@@ -162,13 +157,13 @@ The command will generate a `/results/ckpt_name/results.npz` file with results s
 ## Command-line arguments
 
 - `-e` `--extension` , audio format.
-- `-o` `--overlap` , set to `False` by default. The percentage of overlap between adjacent window.
+- `-o` `--overlap` , set to `False` by default. The percentage of overlap between adjacent windows.
 - `-a` `--average` , set to `True` by default. If the result is averaged throughout the audio track.
 - `-tt` `--train-type` , type of training: `ks` (key signature) for stone12, `ks_mode` for stone24.
 
 ## Mapping
 
-The mappings to transform model output (integers) to key signature and mode classes (text) is as following:
+The mappings to transform model output (integers) of provided checkpoints to key signature and mode classes (text) is as following:
 
 ```python
 # for 12stone (semitone_ks.pt)
@@ -177,7 +172,7 @@ map_ks = {0: 'Bb Major/G minor', 1: 'B Major/G# minor', 2: 'C Major/A minor', 3:
 map_ks_mode = {0: 'B minor', 1: 'C minor', 2: 'C# minor', 3: 'D minor', 4: 'D# minor', 5: 'E minor', 6: 'F minor', 7: 'F# minor', 8: 'G minor', 9: 'G# minor', 10: 'A minor', 11: 'Bb minor', 12: 'D Major', 13: 'D# Major', 14: 'E Major', 15: 'F Major', 16: 'F# Major', 17: 'G Major', 18: 'G# Major', 19: 'A Major', 20: 'Bb Major', 21: 'B Major', 22: 'C Major', 23: 'C# Major'}
 ```
 
-If you train your own models, then the mapping needs to be calculated by using a C major recording provided in the folder `/pitch_fork/Cmajor.mp3` and the output of this input should correspond to the one of C Major.
+If you train your own models, then the mapping needs to be calculated by using the C major recording provided in the folder `/pitch_fork/Cmajor.mp3` and the output of this input should correspond to the one of C Major.
 
 # Code organisation
 ```code
@@ -185,9 +180,9 @@ stone
 ├── Dockerfile  
 ├── pyproject.toml  
 ├── README.md  
-├── init.py  
-├── figures  
+├── pitch_fork 
 │   ├── Cmajor.mp3  
+├── figures
 ├── ckpt  
 │   ├── semisupervised_ks_mode.pt  
 │   └── semitone_ks.pt  
@@ -219,6 +214,7 @@ stone
 │       ├── gin.py  
 │       ├── scheduler.py  
 │       └── training.py  
+├── init.py  
 ├── inference.py  
 ├── main.py  
 └── training_loop.py  
