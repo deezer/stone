@@ -31,7 +31,7 @@ class Stone(torch.nn.Module):
                 x: Tensor
                 ) -> Tuple[Tensor, Tensor]:
         """
-        Return the output for both vocal and accompaniment
+        Return the output for both segments.
         """
         # format data
         s1 = x[:, :, 0] # batch, channel, n_bins, time
