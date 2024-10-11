@@ -1,4 +1,4 @@
-# STONE: Self-supervised Tonality Estimator ![STONE logo](figures/logo.png)
+# STONE: Self-supervised Tonality Estimator <img src="figures/logo.png" height=180>
 
 This repository contains the checkpoints and the full training and inference code for the two models proposed in [STONE paper](https://arxiv.org/abs/2407.07408), accepted at [ISMIR 2024](https://ismir2024.ismir.net). We name them respectively stone12 and stone24 in the repository. 
 
@@ -8,7 +8,8 @@ For clarification:
 
 - **stone12:**  the self-supervised key signature estimator (referred as STONE in the original paper).
 - **stone24:** the semi-supervised (can also be trained fully self-supervised and fully supervised) key signature and mode estimator (referred as 24-STONE, semi-TONE, sup-TONE in the original paper).
-# Overview
+
+# Overview <img src="figures/logo.png" height=180>
 
 💡 **tl;dr STONE is the first self-supervised tonality estimator.**
 
@@ -85,7 +86,7 @@ We plot the confusion matrices of STONE (left, 12 classes) and Semi-TONE (right,
 ![Confusion matrices of STONE (left, 12 classes) and Semi-TONE (right, 24 classes) on FMAK, both using w=7. The axis correspond to model prediction and reference respectively, keys arranged by proximity in the CoF and relative modes. Deeper colors indicate more frequent occurences per relative occurence per reference key.](figures/conf.png)
 
 
-# Setup
+# Setup <img src="figures/logo.png" height=180>
 
  `Python 3.10` is used for this project. `Poetry` is used to manage packages. We also provide a Dockerfile for users to run the program inside of a docker container. 
 
@@ -97,13 +98,13 @@ docker run -ti --gpus all -v ./:/workspace/ --entrypoint bash <image-name>
 poetry run python <script>
 ```
 
-# Training
+## Training
 
-## Example usage
+### Example usage
 
 `poetry run python -m main -n basic -tt ks -g config/ks.gin`
 
-## Command-line arguments
+### Command-line arguments
 
 - `-n` `—-exp-name`, the name of the experiment. If the experience name was used before and checkpoints are saved, then the training will continue from the checkpoint of the experiment of the same name.
 - `-tt` `--train-type` , type of training: `ks` (key signature) for stone12, `ks_mode` for stone24.
@@ -114,7 +115,7 @@ poetry run python <script>
 - `-vs` `--val-steps` , steps of validation per epoch.
 - `-g` `--gin-file` , path to configuration file for training. There are two gin files saved in `/config` , users can modify them to their own purpose.
 
-## Dataloader
+### Dataloader
 
 The dataloader provides waveform data for the model. We do not provide the exact code for dataloader, however we provide the shape and the property of training data needed. 
 
@@ -130,21 +131,21 @@ The dataloader provides waveform data for the model. We do not provide the exact
 💡 **NOTE** : the audio should be normalised to a value range of [0, 1]. The sampling rate we use is `22050Hz`, and the segment length is `15s`, as provided in gin files under `/config` . However you can modify these values easily in the gin files.
 
 
-## Device
+### Device
 
 Users need to specify the device for training in `training_loop.py` .
 
-## Configuration
+### Configuration
 
 We use gin file to configure parameters for audio and architecture, more information of usage at [gin-config](https://github.com/google/gin-config). 
 
-## Results
+### Results
 
 Checkpoints are saved at `./<save_dir>/models/<train_type>/<circle_type>/<name>/` where `save_dir` is passed with the tag `-s` and `name` is passed with the tag `-c` ; Tensorboard information is saved at `./<save_dir>/tensorboard/<train_type>/<circle_type>/<name>/`.
 
-# Inference
+## Inference
 
-## Example usage
+### Example usage
 
 `poetry run python -m inference /checkpoint/path /audio/path -e mp3 -tt ks`
 
@@ -154,14 +155,14 @@ audio path is the the path to the folder where audios are saved.
 
 The command will generate a `/results/ckpt_name/results.npz` file with results saved in the same directory as audios. You can load and analyse the `.npz` file by using `np.load()`. You can also change the saving directory in `inference.py` .
 
-## Command-line arguments
+### Command-line arguments
 
 - `-e` `--extension` , audio format.
 - `-o` `--overlap` , set to `False` by default. The percentage of overlap between adjacent windows.
 - `-a` `--average` , set to `True` by default. If the result is averaged throughout the audio track.
 - `-tt` `--train-type` , type of training: `ks` (key signature) for stone12, `ks_mode` for stone24.
 
-## Mapping
+### Mapping
 
 The mappings to transform model output (integers) of provided checkpoints to key signature and mode classes (text) is as following:
 
@@ -174,7 +175,7 @@ map_ks_mode = {0: 'B minor', 1: 'C minor', 2: 'C# minor', 3: 'D minor', 4: 'D# m
 
 If you train your own models, then the mapping needs to be calculated by using the C major recording provided in the folder `/pitch_fork/Cmajor.mp3` and the output of this input should correspond to the one of C Major.
 
-# Code organisation
+# Code organisation <img src="figures/logo.png" height=180>
 ```code
 stone  
 ├── Dockerfile  
@@ -220,7 +221,7 @@ stone
 └── training_loop.py  
 ```
 
-# Cite
+# Cite <img src="figures/logo.png" height=200>
 
 If you use this work, please cite:
 

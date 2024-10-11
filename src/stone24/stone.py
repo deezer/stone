@@ -59,7 +59,7 @@ class Stone(torch.nn.Module):
                 x: dict
                 ) -> Tuple[Tensor, Tensor]:
         """
-        Return the output for both vocal and accompaniment
+        Return the output for both both segments
         """
         audio = x["audio"]
         assert audio.shape[2] == 1 or audio.shape[2]==2
