@@ -9,6 +9,27 @@ For clarification:
 - **stone12:**  the self-supervised key signature estimator (referred as STONE in the original paper).
 - **stone24:** the semi-supervised (can also be trained fully self-supervised and fully supervised) key signature and mode estimator (referred as 24-STONE, semi-TONE, sup-TONE in the original paper).
 
+# Table of Contents
+
+- [Overview](#overview)
+  - [Front-end](#front-end)
+  - [Cross-power spectral density and loss](#cross-power-spectral-density-and-loss)
+  - [Evaluation](#evaluation)
+  - [Semi-supervised learning for key signature and mode](#semi-supervised-learning-for-key-signature-and-mode)
+- [Setup](#setup)
+  - [Training](#training)
+    - [Example usage](#example-usage)
+    - [Command-line arguments](#command-line-arguments)
+    - [Dataloader](#dataloader)
+    - [Device](#device)
+    - [Configuration](#configuration)
+  - [Inference](#inference)
+    - [Example usage](#example-usage-1)
+    - [Command-line arguments](#command-line-arguments-1)
+    - [Mapping](#mapping)
+- [Code organisation](#code-organisation)
+- [Cite](#cite)
+
 # Overview <img src="figures/logo.png" height=180>
 
 💡 **tl;dr STONE is the first self-supervised tonality estimator.**
