@@ -167,7 +167,6 @@ def main(
     device = "cpu"
     ckpt = load_checkpoint(ckpt_path, "", {})
     dur, sr = [ckpt["audio"]["dur"], ckpt["audio"]["sr"]]
-    import pdbr;pdbr.set_trace()
     ckpt_name = ckpt_path.split("/")[-1][:-3] # TODO: users can change this to adapt to the way checkpoints are saved
     hcqt = HarmonicVQT(
         harmonics=eval(ckpt["gin_info"]["HarmonicVQT.harmonics"]),
